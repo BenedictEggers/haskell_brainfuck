@@ -41,10 +41,10 @@ parse s = Tape [] c (cs ++ [End])
     where (c:cs) = filter (/= Other) $ map charToCommand s
 
 moveRight :: Tape a -> Tape a
-moveRight (Tape ls c (r:rs)) = (Tape (c:ls) r rs)
+moveRight (Tape ls c (r:rs)) = Tape (c:ls) r rs
 
 moveLeft :: Tape a -> Tape a
-moveLeft (Tape (l:ls) c rs) = (Tape ls l (c:rs))
+moveLeft (Tape (l:ls) c rs) = Tape ls l (c:rs)
 moveLeft t = error "Already at left end of tape"
 
 incrementCell :: Tape Int -> Tape Int
