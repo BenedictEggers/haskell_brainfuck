@@ -16,7 +16,7 @@ data Command = IncrementP
              | End  -- Used to represent end of program
              deriving (Show, Eq)
 
-data Tape a = Tape [a] a [a]
+data Tape a = Tape [a] a [a] deriving Show
 
 type Program = Tape Command
 
@@ -57,10 +57,12 @@ runProgram p@(Tape _ LoopR _) t@(Tape _ x _)
     | x /= 0    = runProgram (seekLoopL p) t
     | otherwise = runProgram (moveRight p) t
 
+
 -- General tape manipulation functions
 --
 moveRight :: Tape a -> Tape a
 moveRight (Tape ls c (r:rs)) = Tape (c:ls) r rs
+moveRight t = error "Already at right end of tape"
 
 moveLeft :: Tape a -> Tape a
 moveLeft (Tape (l:ls) c rs) = Tape ls l (c:rs)
@@ -70,12 +72,24 @@ moveLeft t = error "Already at left end of tape"
 -- Program-tape-only functions
 --
 seekLoopL :: Program -> Program
-seekLoopL t@(Tape _ LoopL _) = moveRight t
-seekLoopL t = seekLoopL $ moveLeft t
+seekLoopL p = seekLoopL' (moveLeft p) 0
+
+seekLoopL' :: Program -> Int -> Program
+seekLoopL' t@(Tape _ LoopL _) x
+    | x == 0    = moveRight t
+    | otherwise = seekLoopL' (moveLeft t) (x - 1)
+seekLoopL' t@(Tape _ LoopR _) x = seekLoopL' (moveLeft t) (x + 1)
+seekLoopL' t x = seekLoopL' (moveLeft t) x
 
 seekLoopR :: Program -> Program
-seekLoopR t@(Tape _ LoopR _) = moveRight t
-seekLoopR t = seekLoopR $ moveRight t
+seekLoopR p = seekLoopR' (moveRight p) 0
+
+seekLoopR' :: Program -> Int -> Program
+seekLoopR' t@(Tape _ LoopR _) x
+    | x == 0    = moveRight t
+    | otherwise = seekLoopR' (moveRight t) (x - 1)
+seekLoopR' t@(Tape _ LoopL _) x = seekLoopR' (moveRight t) (x + 1)
+seekLoopR' t x = seekLoopR' (moveRight t) x
 
 
 -- Storage-tape-only functions
