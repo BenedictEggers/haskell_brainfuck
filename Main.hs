@@ -35,10 +35,11 @@ main = do
 
 runProgram :: Program -> Tape Int -> IO ()
 
+runProgram (Tape _ End _) _ = return ()
 runProgram p@(Tape _ IncrementC _) t = runProgram (moveRight p) (incrementCell t)
 runProgram p@(Tape _ DecrementC _) t = runProgram (moveRight p) (decrementCell t)
 runProgram p@(Tape _ IncrementP _) t = runProgram (moveRight p) (moveRight t)
-runProgram p@(Tape _ DecrementP _) t = runProgram (moveRight p) (moveRight t)
+runProgram p@(Tape _ DecrementP _) t = runProgram (moveRight p) (moveLeft t)
 
 runProgram p@(Tape _ Print _) t = do
     printCell t
