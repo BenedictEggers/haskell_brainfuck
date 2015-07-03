@@ -12,6 +12,8 @@ data Command = IncrementP
              | LoopL
              | LoopR
              | Other
+             | End  -- Used to represent end of program
+             deriving (Show, Eq)
 
 data Tape a = Tape [a] a [a]
 
@@ -35,8 +37,8 @@ charToCommand ']' = LoopR
 charToCommand x = Other
 
 parse :: String -> Program
-parse s = Tape [] c cs
-    where (c:cs) = map charToCommand s
+parse s = Tape [] c (cs ++ [End])
+    where (c:cs) = filter (/= Other) $ map charToCommand s
 
 moveRight :: Tape a -> Tape a
 moveRight (Tape ls c (r:rs)) = (Tape (c:ls) r rs)
